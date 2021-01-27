@@ -4,8 +4,7 @@ import {
   Switch,
   Route
 } from 'react-router-dom';
-import Home from './home';
-import Lobby from './lobby';
+import { Home, Lobby } from './pages';
 
 class App extends React.Component<any, any> {
 
@@ -14,7 +13,7 @@ class App extends React.Component<any, any> {
       <Router>
         <Switch>
           <Route path="/lobby" component={Lobby} />
-          <Route path="/" component={Home} />
+          <Route path="*" component={Home} />
         </Switch>
       </Router>
     );

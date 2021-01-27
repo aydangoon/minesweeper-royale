@@ -1,15 +1,16 @@
 import React from 'react';
 import { Colors, NumberColors } from './consts';
-import { Game, Coord, SpaceStatus, GameStatus, Action} from './minesweeper';
+import { Game, Coord, SpaceStatus, GameStatus, Action} from '../minesweeper';
 
-class MyGame extends React.Component<any, any> {
+export class MyGame extends React.Component<any, any> {
   canvasRef: any;
   static side = 30;
 
   constructor(props: any) {
     super(props);
     this.state = {
-      selectedSpace: null
+      selectedSpace: null,
+      spacesOpened: 0
     };
     this.canvasRef = React.createRef();
   }
@@ -36,7 +37,12 @@ class MyGame extends React.Component<any, any> {
 
   handleClick([coord, mouseButton]: [Coord, number]): void {
     if (mouseButton === 0) { // click
-      this.props.game.click(coord);
+      let opened = this.props.game.click(coord);
+      let newAmount = this.state.spacesOpened + opened;
+      if (newAmount > 10) {
+        this.props.getAttackMines(Math.floor(newAmount / 10));
+      }
+      this.setState({ spacesOpened: newAmount > 10 ? 0 : newAmount });
       this.props.socket.emit('action', { gameNumber: this.props.gameNumber, action: { type: 'click', coord: coord }});
     } else if (mouseButton === 2) { // flag
       this.props.game.flag(coord);
@@ -105,5 +111,3 @@ class MyGame extends React.Component<any, any> {
     );
   }
 }
-
-export default MyGame;

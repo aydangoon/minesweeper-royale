@@ -1,7 +1,7 @@
 import io from 'socket.io-client';
 import React from 'react';
 
-export default class Home extends React.Component {
+export class Home extends React.Component {
 
   constructor(props) {
     super(props);
@@ -29,11 +29,14 @@ export default class Home extends React.Component {
 
   render() {
     return (
-      <div>
-        <h1>Searching for Opponents</h1>
-        <h3>{this.state.found}/10</h3>
-        <div className="spinner-border text-primary" role="status">
-          <span className="sr-only">Loading...</span>
+      <div className="container-lg">
+        <div className="d-flex flex-column justify-content-center align-items-center">
+          <h1>Minesweeper Royale</h1>
+          <h3>Searching for Players...</h3>
+          <div className="progress w-100">
+            <div className="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+              style={{width: `${this.state.found * 10}%`}} />
+          </div>
         </div>
       </div>
     );

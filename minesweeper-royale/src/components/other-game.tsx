@@ -1,8 +1,8 @@
 import React from 'react';
 import { Colors, NumberColors } from './consts';
-import { Game, Coord, SpaceStatus, GameStatus } from './minesweeper';
+import { Game, Coord, SpaceStatus, GameStatus } from '../minesweeper';
 
-class OtherGame extends React.Component<any, any> {
+export class OtherGame extends React.Component<any, any> {
   canvasRef: any;
   static side = 10;
 
@@ -53,16 +53,26 @@ class OtherGame extends React.Component<any, any> {
     const width = cols * OtherGame.side;
     const height = rows * OtherGame.side;
     return (
-      <div>
-        <button>Attack</button>
+      <div className="p-2 m-2">
         <canvas ref={this.canvasRef} width={width} height={height}
           style={{width: `${width}px`, height: `${height}px`}} />
-        <div>
-          {`Status: ${this.props.game.status} Flags Placed: ${this.props.game.flagsPlaced}/${this.props.game.settings.mines}`}
+        <div className="d-flex align-items-center">
+          <button className="btn btn-danger mr-1" onClick={this.props.attack}
+            disabled={!this.props.canAttack || this.props.game.status === GameStatus.Exploded}>Attack</button>
+          <div>
+            {StatusText(this.props.game.status)}
+            <div>Flags Placed: {this.props.game.flagsPlaced}/{this.props.game.settings.mines}</div>
+          </div>
         </div>
       </div>
     );
   }
 }
 
-export default OtherGame;
+function StatusText(status: GameStatus) {
+  switch (status) {
+    case GameStatus.Sweeping: return <div className="text-warning">Sweeping</div>
+    case GameStatus.Exploded: return <div className="text-danger">Dead</div>
+    case GameStatus.Solved: return <div className="text-success">Solved!</div>
+  }
+}

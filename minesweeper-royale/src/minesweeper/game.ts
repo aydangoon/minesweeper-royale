@@ -23,10 +23,16 @@ export class Game {
   // Takes an action and calls appropriate public interface methods. This is
   // mainly for conveniance.
   public do(action: Action): void {
-    if (action.type === 'click') {
-      this.click(action.coord);
-    } else {
-      this.flag(action.coord);
+    switch (action.type) {
+      case 'click':
+        this.click(action.coord);
+        break;
+      case 'flag':
+        this.flag(action.coord);
+        break;
+      default:
+        this.addAttackMine();
+        break;
     }
   }
 
@@ -108,6 +114,7 @@ export class Game {
     helpers.getNeighborhoodCoords([r, c], this.settings).forEach(([nr, nc]) => {
       this.field[nr][nc].number++;
     });
+    console.log('ADDED A MINE AT', r, c);
   }
 
   // PRIVATE METHODS -----------------------------------------------------------
