@@ -48,6 +48,10 @@ export class MyGame extends React.Component<any, any> {
       this.props.game.flag(coord);
       this.props.socket.emit('action', { gameNumber: this.props.gameNumber, action: { type: 'flag', coord: coord }});
     }
+
+    if (this.props.game.status === GameStatus.Solved) {
+      this.props.addWinner(this.props.gameNumber);
+    }
     this.forceUpdate();
     this.draw();
   }
@@ -80,7 +84,7 @@ export class MyGame extends React.Component<any, any> {
           ctx.fillStyle = '#f00';
           ctx.fillRect(side*(c + 0.25), side*(r + 0.25), side/2, side/2);
         } else if (status === SpaceStatus.Open && (isMine || number > 0)) {
-          ctx.fillStyle = isMine ? '#f00' : NumberColors[number];
+          ctx.fillStyle = isMine ? '#000' : NumberColors[number];
           ctx.font = `${2 * MyGame.side / 3}px Arial`;
           ctx.textAlign = 'center';
           ctx.fillText(isMine ? 'x' : number, side*(c+0.5), side*(r+0.75));
@@ -96,6 +100,7 @@ export class MyGame extends React.Component<any, any> {
     const height = rows * MyGame.side;
     return (
       <div>
+        <div>{this.props.name}</div>
         <canvas ref={this.canvasRef} width={width} height={height}
           style={{width: `${width}px`, height: `${height}px`}}
           onClick={e => this.handleClick(this.getClickData(e))} onContextMenu={e => {

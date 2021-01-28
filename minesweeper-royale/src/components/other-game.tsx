@@ -54,6 +54,7 @@ export class OtherGame extends React.Component<any, any> {
     const height = rows * OtherGame.side;
     return (
       <div className="p-2 m-2">
+        <div>{this.props.name}</div>
         <canvas ref={this.canvasRef} width={width} height={height}
           style={{width: `${width}px`, height: `${height}px`}} />
         <div className="d-flex align-items-center">
