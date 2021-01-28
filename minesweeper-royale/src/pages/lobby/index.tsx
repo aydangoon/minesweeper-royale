@@ -75,7 +75,7 @@ export class Lobby extends React.Component<any, any> {
   }
 
   initGames() {
-    const temp: Settings = { rows: 14, cols: 18, mines: 1 };
+    const temp: Settings = { rows: 14, cols: 18, mines: 40 };
     const games = [];
     for (let i = 0; i < 10; i++) {
       games.push(new Game(temp));
@@ -128,7 +128,6 @@ export class Lobby extends React.Component<any, any> {
   }
 
   render() {
-    const canAttack = this.state.attackMines > 0;
     if (!this.state.connected) {
       return <Connecting />
     }
@@ -140,20 +139,30 @@ export class Lobby extends React.Component<any, any> {
         }} />
         <div className="row">
           <div className="col-sm-6 border">
-            <MyGame game={this.games[this.state.gameNumber]} socket={this.socket}
-              gameNumber={this.state.gameNumber} getAttackMines={this.getAttackMines.bind(this)}
-              addWinner={this.addWinner.bind(this)} name={this.names[this.state.gameNumber]} />
+            <MyGame
+              inGame={this.state.status === LobbyStatus.InGame}
+              game={this.games[this.state.gameNumber]}
+              socket={this.socket}
+              gameNumber={this.state.gameNumber}
+              getAttackMines={this.getAttackMines.bind(this)}
+              addWinner={this.addWinner.bind(this)}
+              name={this.names[this.state.gameNumber]}
+            />
             <h3>Attack Mines: {this.state.attackMines}</h3>
           </div>
           <div className="col-sm-6 border">
             <div className="d-flex flex-wrap justify-content-around align-items-center">
               {this.games.map((game, i) => {
-                if (i === this.state.gameNumber) {
-                  return <React.Fragment key={i}/>
-                }
-                return <OtherGame key={i} gameNumber={i}
-                  game={this.games[i]} canAttack={canAttack}
-                  attack={() => this.attackGame(i)} name={this.names[i]} />
+                if (i === this.state.gameNumber) return <React.Fragment key={i}/>
+                return (
+                  <OtherGame key={i}
+                    gameNumber={i}
+                    game={this.games[i]}
+                    attackable={this.state.attackMines > 0}
+                    attack={() => this.attackGame(i)}
+                    name={this.names[i]}
+                  />
+                );
               })}
             </div>
           </div>

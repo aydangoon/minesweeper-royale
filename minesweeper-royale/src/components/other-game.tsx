@@ -1,6 +1,7 @@
 import React from 'react';
 import { Colors, NumberColors } from './consts';
 import { Game, Coord, SpaceStatus, GameStatus } from '../minesweeper';
+import { Flag, SpaceIcon } from './images';
 
 export class OtherGame extends React.Component<any, any> {
   canvasRef: any;
@@ -38,7 +39,7 @@ export class OtherGame extends React.Component<any, any> {
           ctx.fillStyle = '#f00';
           ctx.fillRect(side*(c + 0.25), side*(r + 0.25), side/2, side/2);
         } else if (status === SpaceStatus.Open && isMine) {
-          ctx.fillStyle = '#f00';
+          ctx.fillStyle = '#000';
           ctx.font = '10px Arial';
           ctx.textAlign = 'center';
           ctx.fillText('x', side*(c+0.5), side*(r+0.75));
@@ -62,7 +63,7 @@ export class OtherGame extends React.Component<any, any> {
             disabled={!this.props.canAttack || this.props.game.status === GameStatus.Exploded}>Attack</button>
           <div>
             {StatusText(this.props.game.status)}
-            <div>Flags Placed: {this.props.game.flagsPlaced}/{this.props.game.settings.mines}</div>
+            <div><SpaceIcon /> {this.props.game.spacesLeft}</div>
           </div>
         </div>
       </div>

@@ -5,16 +5,16 @@ export class Game {
   public settings: Settings;
   private field: Space[][];
   public firstClick: boolean;
-  public minesLeft: number;
+  public spacesLeft: number;
   public status: GameStatus;
-  public flagsPlaced: number;
+  public mines: number;
 
   // PUBLIC INTERFACE ----------------------------------------------------------
 
   public constructor(settings: Settings) {
     this.settings = settings;
-    this.minesLeft = settings.mines;
-    this.flagsPlaced = 0;
+    this.spacesLeft = (settings.rows * settings.cols) - settings.mines;
+    this.mines = settings.mines;
     this.firstClick = true;
     this.status = GameStatus.Sweeping;
     this.field = this.makeEmptyField();
@@ -60,6 +60,11 @@ export class Game {
       spacesOpened = this.clearZeroes([r, c]);
     }
 
+    this.spacesLeft -= spacesOpened;
+    if (this.spacesLeft === 0) {
+      this.status = GameStatus.Solved;
+    }
+
     return spacesOpened;
 
   }
@@ -71,19 +76,7 @@ export class Game {
     if (space.status === SpaceStatus.Open) {
       return;
     }
-
-    if (space.status === SpaceStatus.Flagged) {
-      space.status = SpaceStatus.Closed;
-      this.minesLeft += space.isMine ? 1 : 0;
-      this.flagsPlaced--;
-    } else {
-      space.status = SpaceStatus.Flagged;
-      this.minesLeft -= space.isMine ? 1 : 0;
-      this.flagsPlaced++;
-      if (this.minesLeft === 0) {
-        this.status = GameStatus.Solved;
-      }
-    }
+    space.status = space.status === SpaceStatus.Flagged ? SpaceStatus.Closed : SpaceStatus.Flagged;
   }
 
   // Get the state of a space located at a given coordinate. Returns a cloned
@@ -108,8 +101,9 @@ export class Game {
 
     // set the selected space to a mine
     space.isMine = true;
-    // increase the total number of mines left
-    this.minesLeft++;
+    // decrease the total number of spaces left to open (since one is now a mine)
+    this.spacesLeft--;
+    this.mines++;
     // increase the number for all neighboring spaces
     helpers.getNeighborhoodCoords([r, c], this.settings).forEach(([nr, nc]) => {
       this.field[nr][nc].number++;

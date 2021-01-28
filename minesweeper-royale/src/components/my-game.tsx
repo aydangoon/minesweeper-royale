@@ -1,6 +1,7 @@
 import React from 'react';
 import { Colors, NumberColors } from './consts';
 import { Game, Coord, SpaceStatus, GameStatus, Action} from '../minesweeper';
+import { Flag, SpaceIcon } from './images';
 
 export class MyGame extends React.Component<any, any> {
   canvasRef: any;
@@ -36,27 +37,35 @@ export class MyGame extends React.Component<any, any> {
   }
 
   handleClick([coord, mouseButton]: [Coord, number]): void {
-    if (mouseButton === 0) { // click
-      let opened = this.props.game.click(coord);
+    const { game, inGame, socket, gameNumber } = this.props;
+    
+    if (!this.props.inGame || game.status !== GameStatus.Sweeping) return;
+
+    const leftClick = (mouseButton === 0);
+    const action = { type: leftClick ? 'click' : 'flag', coord: coord };
+
+    if (leftClick) { // click
+      let opened = game.click(coord);
       let newAmount = this.state.spacesOpened + opened;
       if (newAmount > 10) {
         this.props.getAttackMines(Math.floor(newAmount / 10));
       }
       this.setState({ spacesOpened: newAmount > 10 ? 0 : newAmount });
-      this.props.socket.emit('action', { gameNumber: this.props.gameNumber, action: { type: 'click', coord: coord }});
-    } else if (mouseButton === 2) { // flag
-      this.props.game.flag(coord);
-      this.props.socket.emit('action', { gameNumber: this.props.gameNumber, action: { type: 'flag', coord: coord }});
+    } else { // flag
+      game.flag(coord);
     }
 
-    if (this.props.game.status === GameStatus.Solved) {
-      this.props.addWinner(this.props.gameNumber);
+    if (game.status === GameStatus.Solved) {
+      this.props.addWinner(gameNumber);
     }
+    socket.emit('action', { gameNumber, action });
     this.forceUpdate();
     this.draw();
   }
 
   handleHover(coord: Coord): void {
+    if (!this.props.inGame || this.props.game.status !== GameStatus.Sweeping) return;
+
     this.setState({ selectedSpace: coord });
   }
 
@@ -110,7 +119,12 @@ export class MyGame extends React.Component<any, any> {
           onMouseMove={e => this.handleHover(this.getClickData(e)[0])}
           />
         <h3>
-          {`Status: ${this.props.game.status} Flags Placed: ${this.props.game.flagsPlaced}/${this.props.game.settings.mines}`}
+          Status: {this.props.game.status}
+          <div className="ml-2 d-inline-flex align-items-center">
+            {this.props.game.spacesLeft}
+            <div className="mx-2"><SpaceIcon /></div>
+            left.
+          </div>
         </h3>
       </div>
     );
