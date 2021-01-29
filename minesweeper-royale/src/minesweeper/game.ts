@@ -27,11 +27,8 @@ export class Game {
       case 'click':
         this.click(action.coord);
         break;
-      case 'flag':
-        this.flag(action.coord);
-        break;
       default:
-        this.addAttackMine();
+        this.flag(action.coord);
         break;
     }
   }
@@ -83,32 +80,6 @@ export class Game {
   // Space object.
   public getSpace([r, c]: Coord): Space {
     return { ...this.field[r][c] };
-  }
-
-  // Adds a mine to a random closed space.
-  public addAttackMine(): void {
-    const choices: Coord[] = [];
-    this.field.forEach((row, r) => {
-      row.forEach((space, c) => {
-        if (!space.isMine && space.status === SpaceStatus.Closed) {
-          choices.push([r, c]);
-        }
-      });
-    });
-    const randomIndex = Math.floor(Math.random() * choices.length);
-    const [r, c] = choices[randomIndex];
-    const space = this.field[r][c];
-
-    // set the selected space to a mine
-    space.isMine = true;
-    // decrease the total number of spaces left to open (since one is now a mine)
-    this.spacesLeft--;
-    this.mines++;
-    // increase the number for all neighboring spaces
-    helpers.getNeighborhoodCoords([r, c], this.settings).forEach(([nr, nc]) => {
-      this.field[nr][nc].number++;
-    });
-    console.log('ADDED A MINE AT', r, c);
   }
 
   // PRIVATE METHODS -----------------------------------------------------------

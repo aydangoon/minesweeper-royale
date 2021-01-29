@@ -14,8 +14,17 @@ class Lobby {
   }
 
   addSocketId(sid) {
-    this.gameMap.set(sid, this.playerCount);
+    this.gameMap.set(sid, this.getSmallestFreeGameNumber());
     this.playerCount++;
+  }
+
+  removeSocketId(sid) {
+    this.gameMap.delete(sid);
+    this.playerCount--;
+  }
+
+  isEmpty() {
+    return this.playerCount === 0
   }
 
   getGameNumber(sid) {
@@ -23,6 +32,14 @@ class Lobby {
   }
 
   // PRIVATE METHODS -----------------------------------------------------------
+
+  getSmallestFreeGameNumber() {
+    let values = [...this.gameMap.values()];
+    return new Array(10)
+      .fill(0)
+      .map((elt, i) => i)
+    	.findIndex(x => values.indexOf(x) === -1)
+  }
 }
 
 module.exports = { Lobby };

@@ -2,6 +2,7 @@ import React from 'react';
 import { Colors, NumberColors } from './consts';
 import { Game, Coord, SpaceStatus, GameStatus, Action} from '../minesweeper';
 import { Flag, SpaceIcon } from './images';
+import { StatusText } from './status-text';
 
 export class MyGame extends React.Component<any, any> {
   canvasRef: any;
@@ -10,8 +11,7 @@ export class MyGame extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
     this.state = {
-      selectedSpace: null,
-      spacesOpened: 0
+      selectedSpace: null
     };
     this.canvasRef = React.createRef();
   }
@@ -37,29 +37,16 @@ export class MyGame extends React.Component<any, any> {
   }
 
   handleClick([coord, mouseButton]: [Coord, number]): void {
-    const { game, inGame, socket, gameNumber } = this.props;
-    
+    const { game, inGame, socket, gameNumber, handleAction } = this.props;
+
     if (!this.props.inGame || game.status !== GameStatus.Sweeping) return;
 
     const leftClick = (mouseButton === 0);
     const action = { type: leftClick ? 'click' : 'flag', coord: coord };
 
-    if (leftClick) { // click
-      let opened = game.click(coord);
-      let newAmount = this.state.spacesOpened + opened;
-      if (newAmount > 10) {
-        this.props.getAttackMines(Math.floor(newAmount / 10));
-      }
-      this.setState({ spacesOpened: newAmount > 10 ? 0 : newAmount });
-    } else { // flag
-      game.flag(coord);
-    }
-
-    if (game.status === GameStatus.Solved) {
-      this.props.addWinner(gameNumber);
-    }
     socket.emit('action', { gameNumber, action });
-    this.forceUpdate();
+    handleAction(gameNumber, action);
+    
     this.draw();
   }
 
@@ -107,9 +94,10 @@ export class MyGame extends React.Component<any, any> {
     const { rows, cols } = this.props.game.settings;
     const width = cols * MyGame.side;
     const height = rows * MyGame.side;
+    const status: GameStatus = this.props.game.status;
     return (
       <div>
-        <div>{this.props.name}</div>
+        <h1>{this.props.name}</h1>
         <canvas ref={this.canvasRef} width={width} height={height}
           style={{width: `${width}px`, height: `${height}px`}}
           onClick={e => this.handleClick(this.getClickData(e))} onContextMenu={e => {
@@ -118,14 +106,10 @@ export class MyGame extends React.Component<any, any> {
           }}
           onMouseMove={e => this.handleHover(this.getClickData(e)[0])}
           />
-        <h3>
-          Status: {this.props.game.status}
-          <div className="ml-2 d-inline-flex align-items-center">
-            {this.props.game.spacesLeft}
-            <div className="mx-2"><SpaceIcon /></div>
-            left.
-          </div>
-        </h3>
+        <div className="d-flex align-items-center justify-content-around">
+          <div><SpaceIcon /> {this.props.game.spacesLeft}</div>
+          {StatusText(this.props.game.status)}
+        </div>
       </div>
     );
   }

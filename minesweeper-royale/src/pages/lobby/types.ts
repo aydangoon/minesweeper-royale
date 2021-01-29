@@ -3,3 +3,10 @@ export enum LobbyStatus {
   CountDown,
   InGame
 }
+
+export enum PlayerState {
+  Disconnected,
+  Waiting,
+  Playing,
+  Idle
+}

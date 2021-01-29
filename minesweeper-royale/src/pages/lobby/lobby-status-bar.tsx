@@ -9,14 +9,14 @@ export function LobbyStatusBar(props: any) {
       <Fragment>
         {status === LobbyStatus.ReadyUp ? (
           <Fragment>
-            <div>{playersReady}/10 Ready</div>
-            <div>
+            <h3>{playersReady}/10 Ready</h3>
+            <h3>
               <span>I'm Ready</span>
               <input type="checkbox" onChange={readyClick} checked={ready} />
-            </div>
+            </h3>
           </Fragment>
         ) : (
-          <div>{status === LobbyStatus.CountDown ? countDownTimer : 'Go!'}</div>
+          <h3>{status === LobbyStatus.CountDown ? countDownTimer : 'Go!'}</h3>
         )}
       </Fragment>
       <div>

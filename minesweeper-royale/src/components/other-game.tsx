@@ -2,6 +2,7 @@ import React from 'react';
 import { Colors, NumberColors } from './consts';
 import { Game, Coord, SpaceStatus, GameStatus } from '../minesweeper';
 import { Flag, SpaceIcon } from './images';
+import { StatusText } from './status-text';
 
 export class OtherGame extends React.Component<any, any> {
   canvasRef: any;
@@ -58,23 +59,11 @@ export class OtherGame extends React.Component<any, any> {
         <div>{this.props.name}</div>
         <canvas ref={this.canvasRef} width={width} height={height}
           style={{width: `${width}px`, height: `${height}px`}} />
-        <div className="d-flex align-items-center">
-          <button className="btn btn-danger mr-1" onClick={this.props.attack}
-            disabled={!this.props.canAttack || this.props.game.status === GameStatus.Exploded}>Attack</button>
-          <div>
-            {StatusText(this.props.game.status)}
-            <div><SpaceIcon /> {this.props.game.spacesLeft}</div>
-          </div>
+        <div className="d-flex align-items-center justify-content-around">
+          <div><SpaceIcon /> {this.props.game.spacesLeft}</div>
+          {StatusText(this.props.game.status)}
         </div>
       </div>
     );
-  }
-}
-
-function StatusText(status: GameStatus) {
-  switch (status) {
-    case GameStatus.Sweeping: return <div className="text-warning">Sweeping</div>
-    case GameStatus.Exploded: return <div className="text-danger">Dead</div>
-    case GameStatus.Solved: return <div className="text-success">Solved!</div>
   }
 }
